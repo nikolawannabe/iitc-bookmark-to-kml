@@ -1,152 +1,39 @@
-<?DOCTYPE html ?>
-<html lang="zh_CN">
-    <head>
-        <meta charset="UTF-8" >
-        <meta name="description" content="This is a single page tool to convert Ingress IITC bookmarks to kml">
-        <meta name="keywords" content="Ingress,IITC,kml">
-        <title>IITC Bookmark to kml</title>
-        <style>
-body {
-    background-color: #0E3D4E;
-    color: #EEE;
-    font-family: "Roboto","Helvetica Neue",Helvetica,sans-serif;
-    font-size: 13px;
-}
-a, button, .link {
-    color: #FFCE00;
-}
-a:hover {
-    color: #EEE;
-}
-button {
-    padding: 2px;
-    min-width: 40px;
-    min-height: 40px;
-    border: 1px solid #FFCE00;
-    background-color: rgba(8, 48, 78, 0.9);
-    width: 100%;
-    cursor: pointer;
-    font-family: "Roboto","Helvetica Neue",Helvetica,sans-serif;
-}
-#name, textarea {
-    color: #20A8B1;
-    border: 1px solid #FFCE00;
-    background-color: rgba(8, 48, 78, 0.9);
-    width: 100%;
-}
-#bookmark {
-    width: 100%;
-    min-height: 200px;
-    margin: 10px 0;
-}
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="UTF-8">
+    <title>Iitc-bookmark-to-kml by nikolawannabe</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="stylesheets/normalize.css" media="screen">
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/github-light.css" media="screen">
+  </head>
+  <body>
+    <section class="page-header">
+      <h1 class="project-name">Iitc-bookmark-to-kml</h1>
+      <h2 class="project-tagline">A simple-page tool to convert Ingress IITC bookmark to KML</h2>
+      <a href="https://github.com/nikolawannabe/iitc-bookmark-to-kml" class="btn">View on GitHub</a>
+      <a href="https://github.com/nikolawannabe/iitc-bookmark-to-kml/zipball/master" class="btn">Download .zip</a>
+      <a href="https://github.com/nikolawannabe/iitc-bookmark-to-kml/tarball/master" class="btn">Download .tar.gz</a>
+    </section>
 
-        </style>
-    </head>
-    <body>
-        <a href="https://github.com/biggates/iitc-bookmark-to-kml"><img style="position: absolute; top: 0; right: 0; border: 0;" src="./images/forkme_ingress_style.png" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_green_007200.png"></a>
-    
-        <h1>IITC Bookmark to kml</h1>
-        <div id="manual">
-            <h2>How to use?</h2>
-            <ol>
-                <li>Open <a href="//ingress.com/intel" target="_blank">Ingress Intel Map</a></li>
-                <li>Get <a href="//iitc.jonatkins.com/?page=desktop" target="_blank">IITC</a> and <a href="http://iitc.jonatkins.com/release/plugins/bookmarks-by-zaso.user.js">Bookmarks for maps and portals</a> plugin.</li>
-                <li>Add your desired portals to bookmark. Organize them into folders if required.</li>
-                <li>In <span class="link">Bookmarks Opt</span>, click <span class="link">Copy bookmarks</span></li>
-                <li><span class="link">Select all</span> and copy the code AND paste under the text area below.</li>
-                <li>(Optional) name your kml</li>
-                <li>Click <span class="link">Get KML</span> button to download the kml file.</li>
-                <li>SHARE the kml file</li>
-                <li>Use that kml file in <a href="https://www.google.com/maps/d/" target="_blank">Google My Maps</a>, add a layer and import the kml</li>
-            </ol>
-        </div>
-        <input type="text" id="name" placeholder="Name your bookmark(optional)" />
-        <textarea id="bookmark" placeholder="Paste your bookmark code here"></textarea>
-        <button onclick="kml()" >Get KML</button>
-        
-        <script>
-function saveAs(uri, filename) {
-    var link = document.createElement('a');
-    if (typeof link.download === 'string') {
-        link.href = uri;
-        link.download = filename;
+    <section class="main-content">
+      <h1>
+<a id="iitc-bookmark-to-kml" class="anchor" href="#iitc-bookmark-to-kml" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>iitc-bookmark-to-kml</h1>
 
-        //Firefox requires the link to be in the body
-        document.body.appendChild(link);
+<p>A simple-page tool to convert Ingress IITC bookmark to KML</p>
 
-        //simulate click
-        link.click();
+<p>A working demo lives <a href="http://biggates.github.io/iitc-bookmark-to-kml/">here</a></p>
 
-        //remove the link when done
-        document.body.removeChild(link);
-    } else {
-        window.open(uri);
-    }
-}
-        
-function kml(){
-    var bookmarkStr = document.getElementById('bookmark').value;
-    var bookmark = JSON.parse(bookmarkStr);
-    var folders = bookmark.portals;
-    var parsedFolders = [];
-    for(var i in folders){
-        var folder = folders[i];
-        var f = {
-            label: folder.label,
-            portals: []
-        };
-        for(var j in folder.bkmrk){
-            var portal = folder.bkmrk[j];
-            var p = {
-                id: portal.guid,
-                label: portal.label,
-                latlng: portal.latlng.split(",").reverse().join(",")
-            };
-            
-            f.portals.push(p);
-        }
-        
-        parsedFolders.push(f);
-    }
-    
-    // now generate kml string
-    var kmlStr = '<?xml version="1.0" encoding="UTF-8"?><kml xmlns="http://www.opengis.net/kml/2.2"><Document>';
-    
-    var name = document.getElementById('name').value || 'bookmark';
-    kmlStr += '<name>' + name + '</name>';
-    
-    for(var i in parsedFolders){
-        var folder = parsedFolders[i];
-        kmlStr += '<Folder><name>' + folder.label + '</name>';
-        for (var j in folder.portals){
-            var portal = folder.portals[j];
-            kmlStr += '<Placemark id="' + portal.id + '">';
-            kmlStr += '<name>' + portal.label + '</name>';
-            kmlStr += '<Point><coordinates>' + portal.latlng + '</coordinates></Point>';
-            kmlStr += '</Placemark>';
-        }
-        kmlStr += '</Folder>';
-    }
-    kmlStr += ' </Document></kml>';
+      <footer class="site-footer">
+        <span class="site-footer-owner"><a href="https://github.com/nikolawannabe/iitc-bookmark-to-kml">Iitc-bookmark-to-kml</a> is maintained by <a href="https://github.com/nikolawannabe">nikolawannabe</a>.</span>
 
-    // now open new window with kmlStr 
-    var mtype = 'application/vnd.google-earth.kml+xml';
-    var url = 'data:' + mtype + ';charset=utf-8,' + encodeURIComponent(kmlStr);
-    var filename = name + '.kml';
-    saveAs(url, filename);
-}
-        </script>
-        
-<!-- Google Analytics -->
-<script>
-  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+        <span class="site-footer-credits">This page was generated by <a href="https://pages.github.com">GitHub Pages</a> using the <a href="https://github.com/jasonlong/cayman-theme">Cayman theme</a> by <a href="https://twitter.com/jasonlong">Jason Long</a>.</span>
+      </footer>
 
-  ga('create', 'UA-65727946-1', 'auto');
-  ga('send', 'pageview');
+    </section>
 
-</script>
-    </body>
+  
+  </body>
 </html>
